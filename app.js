@@ -116,8 +116,8 @@ let splatMode = false;
 
 function initThreeJS() {
     const container = document.getElementById('three-canvas');
-    const width = container.clientWidth || 380;
-    const height = container.clientHeight || 700;
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
 
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x022c22, 0.12);
@@ -153,6 +153,7 @@ function initThreeJS() {
     create3DTrees();
 
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener('orientationchange', onWindowResize);
     animate();
 }
 
@@ -283,7 +284,7 @@ function onWindowResize() {
 }
 
 /* ==========================================================================
-   2D FLOATING GLASS HOTSPOTS MAPPING
+   2D FLOATING GLASS HOTSPOTS MAPPING (MOBILE TOUCH OPTIMIZED)
    ========================================================================== */
 function updateHotspotsOverlay() {
     const overlay = document.getElementById('hotspots-overlay');
@@ -307,8 +308,9 @@ function updateHotspotsOverlay() {
         if (vec.z < 1) {
             html += `
                 <div onclick="selectHotspot('${item.id}')" 
+                     ontouchstart="selectHotspot('${item.id}')"
                      style="left: ${x}px; top: ${y}px;" 
-                     class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-20">
+                     class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-30 touch-manipulation">
                     <div class="hotspot-ring"></div>
                     <div class="w-10 h-10 rounded-2xl glass-panel border flex items-center justify-center text-sm transition-all duration-300 transform group-hover:scale-125 shadow-xl"
                          style="border-color: ${item.color}; color: ${item.color};">
@@ -367,10 +369,10 @@ function selectHotspot(id) {
         </div>
 
         <div class="flex gap-2">
-            <button onclick="playSpeciesSound(${item.audioFreq})" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2">
+            <button onclick="playSpeciesSound(${item.audioFreq})" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation">
                 <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
             </button>
-            <button onclick="markAsDiscovered('${item.id}')" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+            <button onclick="markAsDiscovered('${item.id}')" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation">
                 <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
             </button>
         </div>
@@ -413,9 +415,9 @@ function filterCategory(cat) {
     ['all', 'flora', 'fauna', 'curiosidades'].forEach(c => {
         const btn = document.getElementById(`filter-${c}`);
         if (c === cat) {
-            btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5';
+            btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 touch-manipulation';
         } else {
-            btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300';
+            btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 touch-manipulation';
         }
     });
 }
@@ -445,8 +447,11 @@ function markAsDiscovered(id) {
 }
 
 function updateDiscoveredProgress() {
-    const count = trailData.filter(x => x.discovered).length;
-    document.getElementById('discovered-counter').innerText = `${count} de ${trailData.length} Especies Descubiertas`;
+    const elem = document.getElementById('discovered-counter');
+    if (elem) {
+        const count = trailData.filter(x => x.discovered).length;
+        elem.innerText = `${count} de ${trailData.length} Especies Descubiertas`;
+    }
 }
 
 /* ==========================================================================
@@ -459,10 +464,12 @@ function switchTab(tab) {
 
     ['trail', 'catalog', 'audio', 'quest'].forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
-        if (t === tab) {
-            btn.className = 'flex flex-col items-center gap-1 text-emerald-400 font-medium';
-        } else {
-            btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition';
+        if (btn) {
+            if (t === tab) {
+                btn.className = 'flex flex-col items-center gap-1 text-emerald-400 font-medium touch-manipulation';
+            } else {
+                btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation';
+            }
         }
     });
 
@@ -482,7 +489,7 @@ function switchTab(tab) {
             </h2>
             <div class="space-y-3">
                 ${trailData.map(item => `
-                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition">
+                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition touch-manipulation">
                         <img src="${item.image}" class="w-14 h-14 rounded-xl object-cover">
                         <div class="flex-1">
                             <span class="text-[9px] uppercase font-bold text-emerald-400 block">${item.typeLabel}</span>
@@ -505,14 +512,14 @@ function switchTab(tab) {
                 </div>
                 <h3 class="text-xs font-bold text-slate-100">Sintonizador del Bosque Nublado</h3>
                 <p class="text-[10px] text-slate-400 mt-1">Sintetizador binaural de fauna y viento en tiempo real.</p>
-                <button onclick="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg">
+                <button onclick="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation">
                     Reproducir Ambiente
                 </button>
             </div>
             <div class="space-y-2">
                 <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
                 ${trailData.filter(x => x.category === 'fauna').map(item => `
-                    <div onclick="playSpeciesSound(${item.audioFreq})" class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60">
+                    <div onclick="playSpeciesSound(${item.audioFreq})" class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60 touch-manipulation">
                         <div class="flex items-center gap-2.5">
                             <i class="fa-solid fa-circle-play text-emerald-400 text-lg"></i>
                             <div>
@@ -567,7 +574,7 @@ function closeTabPanel() {
 }
 
 /* ==========================================================================
-   WEB AUDIO SYNTHESIZER
+   WEB AUDIO SYNTHESIZER (DESBLOQUEO AUTOMÁTICO EN MÓVILES)
    ========================================================================== */
 let audioCtx;
 let isAudioPlaying = false;
@@ -577,25 +584,34 @@ function initAudioContext() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-}
-
-function toggleAudio() {
-    initAudioContext();
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
+}
+
+// Escuchador global para desbloquear el audio en el primer toque del celular
+function unlockMobileAudio() {
+    initAudioContext();
+    window.removeEventListener('touchstart', unlockMobileAudio);
+    window.removeEventListener('click', unlockMobileAudio);
+}
+window.addEventListener('touchstart', unlockMobileAudio, { once: true });
+window.addEventListener('click', unlockMobileAudio, { once: true });
+
+function toggleAudio() {
+    initAudioContext();
 
     isAudioPlaying = !isAudioPlaying;
     const btn = document.getElementById('ambient-audio-btn');
     const icon = document.getElementById('audio-icon');
 
     if (isAudioPlaying) {
-        icon.className = 'fa-solid fa-volume-high text-emerald-400';
-        btn.classList.add('bg-emerald-500/30');
+        if (icon) icon.className = 'fa-solid fa-volume-high text-emerald-400';
+        if (btn) btn.classList.add('bg-emerald-500/30');
         startForestSound();
     } else {
-        icon.className = 'fa-solid fa-volume-xmark';
-        btn.classList.remove('bg-emerald-500/30');
+        if (icon) icon.className = 'fa-solid fa-volume-xmark';
+        if (btn) btn.classList.remove('bg-emerald-500/30');
         stopForestSound();
     }
 }
@@ -629,13 +645,12 @@ function startForestSound() {
 
 function stopForestSound() {
     if (windNoiseNode) {
-        windNoiseNode.stop();
+        try { windNoiseNode.stop(); } catch(e){}
     }
 }
 
 function playSynthBeep(freq = 440) {
     initAudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -656,7 +671,6 @@ function playSynthBeep(freq = 440) {
 
 function playSpeciesSound(freq) {
     initAudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
 
     for (let i = 0; i < 3; i++) {
         setTimeout(() => {
@@ -691,10 +705,10 @@ function toggleViewMode() {
 
     if (isPhoneView) {
         container.className = 'phone-mockup relative w-[380px] h-[780px] bg-slate-950 overflow-hidden flex flex-col border-4 border-slate-800 transition-all duration-500';
-        text.innerText = 'Modo Teléfono';
+        if (text) text.innerText = 'Modo Teléfono';
     } else {
         container.className = 'relative w-full max-w-4xl h-[780px] rounded-3xl bg-slate-950 overflow-hidden flex flex-col border border-slate-800 transition-all duration-500 shadow-2xl';
-        text.innerText = 'Modo Expandido';
+        if (text) text.innerText = 'Modo Expandido';
     }
 
     setTimeout(onWindowResize, 300);
@@ -729,7 +743,7 @@ function handleSearch() {
     const filtered = trailData.filter(x => x.name.toLowerCase().includes(query) || x.scientific.toLowerCase().includes(query));
 
     results.innerHTML = filtered.map(item => `
-        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50">
+        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 touch-manipulation">
             <div>
                 <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
                 <p class="text-[10px] text-slate-400 font-mono">${item.scientific}</p>
