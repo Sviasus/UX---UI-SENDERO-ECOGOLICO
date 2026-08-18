@@ -68,3 +68,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* Padding seguro inferior para contenedores con scroll móvil */
+#tab-panel-container {
+    padding-bottom: 7rem !important;
+}
+
+#bottom-sheet > div {
+    max-height: 70vh;
+    overflow-y: auto;
+}
