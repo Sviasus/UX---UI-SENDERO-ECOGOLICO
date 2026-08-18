@@ -130,20 +130,26 @@
                     </div>
                 </div>
 
-                <!-- Category Filters (Floating Glass Pills) -->
-                <div class="fixed top-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 overflow-x-auto max-w-[90vw] px-2 py-1 no-scrollbar pointer-events-auto">
-                    <button id="filter-all" onclick="filterCategory('all')" ontouchstart="filterCategory('all')" class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer touch-manipulation">
-                        <i class="fa-solid fa-border-all text-[10px]"></i> Todo
-                    </button>
-                    <button id="filter-flora" onclick="filterCategory('flora')" ontouchstart="filterCategory('flora')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
-                        <i class="fa-solid fa-seedling text-[10px]"></i> Flora
-                    </button>
-                    <button id="filter-fauna" onclick="filterCategory('fauna')" ontouchstart="filterCategory('fauna')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
-                        <i class="fa-solid fa-dove text-[10px]"></i> Fauna
-                    </button>
-                    <button id="filter-curiosidades" onclick="filterCategory('curiosidades')" ontouchstart="filterCategory('curiosidades')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
-                        <i class="fa-solid fa-lightbulb text-[10px]"></i> Curiosidades
-                    </button>
+                <!-- BARRA DE FILTRADO FIJA SUPERIOR -->
+                <div class="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-auto max-w-[92vw] pointer-events-auto">
+                    <div class="glass-panel rounded-full px-3 py-1.5 flex items-center gap-2 overflow-x-auto no-scrollbar border border-slate-700/60 shadow-xl bg-slate-950/80 backdrop-blur-md">
+                        <button id="filter-all" onclick="filterCategory('all')" ontouchstart="filterCategory('all'); event.preventDefault();" 
+                                class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer touch-manipulation">
+                            <i class="fa-solid fa-border-all text-[10px]"></i> Todo
+                        </button>
+                        <button id="filter-flora" onclick="filterCategory('flora')" ontouchstart="filterCategory('flora'); event.preventDefault();" 
+                                class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                            <i class="fa-solid fa-seedling text-[10px]"></i> Flora
+                        </button>
+                        <button id="filter-fauna" onclick="filterCategory('fauna')" ontouchstart="filterCategory('fauna'); event.preventDefault();" 
+                                class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                            <i class="fa-solid fa-dove text-[10px]"></i> Fauna
+                        </button>
+                        <button id="filter-curiosidades" onclick="filterCategory('curiosidades')" ontouchstart="filterCategory('curiosidades')" 
+                                class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                            <i class="fa-solid fa-lightbulb text-[10px]"></i> Curiosidades
+                        </button>
+                    </div>
                 </div>
 
                 <!-- DYNAMIC FLOATING GLASS HOTSPOTS CONTAINER -->
