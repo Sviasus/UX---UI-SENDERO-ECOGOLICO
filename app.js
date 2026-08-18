@@ -112,6 +112,7 @@ const trailData = [
 let scene, camera, renderer, controls;
 let splatParticles, trailLineMesh, treeGroup;
 let currentFilter = 'all';
+let isDragging = false; // Control para evitar conflictos de clic y arrastre en PC
 
 function initThreeJS() {
     const container = document.getElementById('three-canvas');
@@ -120,7 +121,6 @@ function initThreeJS() {
     const height = container.clientHeight || window.innerHeight;
 
     scene = new THREE.Scene();
-    // 1. Color de fondo del cielo (Azul cielo diurno) y la niebla que se funde con el horizonte
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.FogExp2(0x87ceeb, 0.05);
 
@@ -139,16 +139,17 @@ function initThreeJS() {
     controls.minDistance = 2;
     controls.maxDistance = 12;
 
-    // 2. Luz ambiental clara y luminosa simulando la luz rebotada del cielo diurno
+    // Detectar si el usuario está arrastrando la cámara para no abrir hotspots por accidente en PC
+    renderer.domElement.addEventListener('pointerdown', () => { isDragging = false; });
+    renderer.domElement.addEventListener('pointermove', () => { isDragging = true; });
+
     const ambientLight = new THREE.AmbientLight(0xd9f99d, 1.2);
     scene.add(ambientLight);
 
-    // 3. Sol brillante y cálido desde arriba
     const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
     sunLight.position.set(5, 12, 5);
     scene.add(sunLight);
 
-    // 4. Luz de realce suave para los elementos del suelo
     const pointLight = new THREE.PointLight(0xfef08a, 2, 10);
     pointLight.position.set(0, 2, 0);
     scene.add(pointLight);
@@ -238,23 +239,19 @@ function createParticlesCloud() {
 function create3DTrees() {
     treeGroup = new THREE.Group();
     
-    // Lista original y 5 nuevas posiciones más lejanas (z más alto en negativo o positivo)
     const treePositions = [
         { x: -3.5, z: -2 }, { x: 3.2, z: -3 },
         { x: -2.8, z: 2 }, { x: 2.8, z: 2.5 },
         { x: 0, z: -4 },
-        // Nuevos árboles más lejos
         { x: -6.0, z: -7.0 }, { x: 6.0, z: -7.0 }, 
         { x: -8.0, z: 0 }, { x: 8.0, z: 0 }, 
         { x: 0, z: 8.0 }
     ];
 
     treePositions.forEach((p, index) => {
-        // Determinamos si es un árbol lejano (índice mayor a 4) para hacerlo más oscuro
         const isFarTree = index > 4;
         
         const trunkGeo = new THREE.CylinderGeometry(0.12, 0.2, 3, 8);
-        // Tronco estándar o más oscuro para los lejanos
         const trunkMat = new THREE.MeshStandardMaterial({ 
             color: isFarTree ? 0x271a14 : 0x3f2e25, 
             roughness: 0.9 
@@ -263,7 +260,6 @@ function create3DTrees() {
         trunk.position.set(p.x, 0, p.z);
 
         const leavesGeo = new THREE.DodecahedronGeometry(1.2, 1);
-        // Hojas: Verde bosque profundo para los cercanos, casi negro/verde muy oscuro para los lejanos
         const leavesMat = new THREE.MeshStandardMaterial({ 
             color: isFarTree ? 0x022c22 : 0x064e3b, 
             roughness: 0.8 
@@ -323,8 +319,8 @@ function updateHotspotsOverlay() {
 
         if (vec.z < 1) {
             html += `
-                <div onclick="selectHotspot('${item.id}')" 
-                     ontouchstart="selectHotspot('${item.id}')"
+                <div data-id="${item.id}"
+                     onpointerup="if(!isDragging){ selectHotspot('${item.id}'); }"
                      style="left: ${x}px; top: ${y}px;" 
                      class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-30 touch-manipulation">
                     <div class="hotspot-ring"></div>
@@ -365,7 +361,7 @@ function selectHotspot(id) {
 
     content.innerHTML = `
         <div class="relative pt-2">
-            <button onclick="closeBottomSheet()" ontouchstart="closeBottomSheet(); event.preventDefault();" 
+            <button onpointerup="closeBottomSheet(); event.stopPropagation();" 
                     class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm transition border border-slate-700 z-50 touch-manipulation cursor-pointer shadow-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -393,11 +389,11 @@ function selectHotspot(id) {
             </div>
 
             <div class="flex gap-2">
-                <button onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq}); event.preventDefault();"
+                <button onpointerup="playSpeciesSound(${item.audioFreq})"
                         class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
                 </button>
-                <button onclick="markAsDiscovered('${item.id}')" ontouchstart="markAsDiscovered('${item.id}'); event.preventDefault();"
+                <button onpointerup="markAsDiscovered('${item.id}')"
                         class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
                 </button>
@@ -445,9 +441,9 @@ function filterCategory(cat) {
         const btn = document.getElementById(`filter-${c}`);
         if (btn) {
             if (c === cat) {
-                btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 touch-manipulation cursor-pointer';
+                btn.className = 'glass-pill glass-pill-active py-1.5 px-1 rounded-xl text-[11px] font-semibold transition flex items-center justify-center gap-1 cursor-pointer touch-manipulation truncate';
             } else {
-                btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 touch-manipulation cursor-pointer';
+                btn.className = 'glass-pill py-1.5 px-1 rounded-xl text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1 hover:text-emerald-300 cursor-pointer touch-manipulation truncate';
             }
         }
     });
@@ -517,7 +513,7 @@ function switchTab(tab) {
             </h2>
             <div class="space-y-3">
                 ${trailData.map(item => `
-                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" ontouchstart="selectHotspot('${item.id}'); closeTabPanel();" 
+                    <div onpointerup="selectHotspot('${item.id}'); closeTabPanel();" 
                          class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition touch-manipulation">
                         <img src="${item.image}" class="w-14 h-14 rounded-xl object-cover">
                         <div class="flex-1">
@@ -541,14 +537,14 @@ function switchTab(tab) {
                 </div>
                 <h3 class="text-xs font-bold text-slate-100">Sintonizador del Bosque Nublado</h3>
                 <p class="text-[10px] text-slate-400 mt-1">Sintetizador binaural de fauna y viento en tiempo real.</p>
-                <button onclick="toggleAudio()" ontouchstart="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation">
+                <button onpointerup="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation cursor-pointer">
                     Reproducir Ambiente
                 </button>
             </div>
             <div class="space-y-2">
                 <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
                 ${trailData.filter(x => x.category === 'fauna').map(item => `
-                    <div onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq})" 
+                    <div onpointerup="playSpeciesSound(${item.audioFreq})" 
                          class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60 touch-manipulation">
                         <div class="flex items-center gap-2.5">
                             <i class="fa-solid fa-circle-play text-emerald-400 text-lg"></i>
@@ -610,7 +606,7 @@ function closeTabPanel() {
 }
 
 /* ==========================================================================
-   WEB AUDIO SYNTHESIZER (MOBIL COMPATIBLE)
+   WEB AUDIO SYNTHESIZER (MOBILE COMPATIBLE)
    ========================================================================== */
 let audioCtx;
 let isAudioPlaying = false;
@@ -767,7 +763,7 @@ function handleSearch() {
     const filtered = trailData.filter(x => x.name.toLowerCase().includes(query) || x.scientific.toLowerCase().includes(query));
 
     results.innerHTML = filtered.map(item => `
-        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" ontouchstart="selectHotspot('${item.id}'); closeSearchModal();"
+        <div onpointerup="selectHotspot('${item.id}'); closeSearchModal();"
              class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 touch-manipulation">
             <div>
                 <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
