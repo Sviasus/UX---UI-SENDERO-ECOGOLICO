@@ -342,13 +342,13 @@ function selectHotspot(id) {
     if (!sheet || !content) return;
 
     content.innerHTML = `
-        <div class="relative">
-            <button onclick="closeBottomSheet()" ontouchstart="closeBottomSheet()" 
-                    class="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition border border-slate-700 z-50 touch-manipulation">
+        <div class="relative pt-2">
+            <button onclick="closeBottomSheet()" ontouchstart="closeBottomSheet(); event.preventDefault();" 
+                    class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm transition border border-slate-700 z-50 touch-manipulation cursor-pointer shadow-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <div class="flex items-start gap-3 mb-3 pr-8">
+            <div class="flex items-start gap-3 mb-3 pr-6">
                 <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-2xl object-cover border border-slate-700 shadow-md">
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
@@ -371,12 +371,12 @@ function selectHotspot(id) {
             </div>
 
             <div class="flex gap-2">
-                <button onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq})"
-                        class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation">
+                <button onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq}); event.preventDefault();"
+                        class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
                 </button>
-                <button onclick="markAsDiscovered('${item.id}')" ontouchstart="markAsDiscovered('${item.id}')"
-                        class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation">
+                <button onclick="markAsDiscovered('${item.id}')" ontouchstart="markAsDiscovered('${item.id}'); event.preventDefault();"
+                        class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
                 </button>
             </div>

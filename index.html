@@ -63,19 +63,6 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <!-- Toggle View Mode -->
-            <button id="view-mode-btn" onclick="toggleViewMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition flex items-center gap-2">
-                <i class="fa-solid fa-mobile-screen"></i>
-                <span id="view-mode-text">Modo Teléfono</span>
-            </button>
-
-            <!-- Audio Ambient Toggle -->
-            <button id="ambient-audio-btn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-medium text-emerald-300 transition flex items-center gap-2">
-                <i id="audio-icon" class="fa-solid fa-volume-xmark"></i>
-                <span id="audio-status-text">Sonido Bosque</span>
-            </button>
-        </div>
     </header>
 
     <!-- Main Container Frame -->
@@ -136,25 +123,26 @@
                                 </p>
                             </div>
                         </div>
-                        <button onclick="openSearchModal()" class="w-7 h-7 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-300 text-xs hover:text-emerald-400">
+                       <button onclick="openSearchModal()" ontouchstart="openSearchModal()" 
+                            class="w-10 h-10 rounded-2xl glass-panel flex items-center justify-center text-slate-200 hover:text-emerald-400 transition cursor-pointer touch-manipulation pointer-events-auto">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Category Filters (Floating Glass Pills) -->
-                <div class="absolute top-28 left-0 right-0 z-30 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 py-1">
-                    <button onclick="filterCategory('all')" id="filter-all" class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-border-all"></i> Todo
+                <div class="fixed top-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 overflow-x-auto max-w-[90vw] px-2 py-1 no-scrollbar pointer-events-auto">
+                    <button id="filter-all" onclick="filterCategory('all')" ontouchstart="filterCategory('all')" class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer touch-manipulation">
+                        <i class="fa-solid fa-border-all text-[10px]"></i> Todo
                     </button>
-                    <button onclick="filterCategory('flora')" id="filter-flora" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300">
-                        <i class="fa-solid fa-seedling text-emerald-400"></i> Flora
+                    <button id="filter-flora" onclick="filterCategory('flora')" ontouchstart="filterCategory('flora')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                        <i class="fa-solid fa-seedling text-[10px]"></i> Flora
                     </button>
-                    <button onclick="filterCategory('fauna')" id="filter-fauna" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-sky-300">
-                        <i class="fa-solid fa-dove text-sky-400"></i> Aves
+                    <button id="filter-fauna" onclick="filterCategory('fauna')" ontouchstart="filterCategory('fauna')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                        <i class="fa-solid fa-dove text-[10px]"></i> Fauna
                     </button>
-                    <button onclick="filterCategory('curiosidades')" id="filter-curiosidades" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-amber-300">
-                        <i class="fa-solid fa-lightbulb text-amber-400"></i> Datos
+                    <button id="filter-curiosidades" onclick="filterCategory('curiosidades')" ontouchstart="filterCategory('curiosidades')" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
+                        <i class="fa-solid fa-lightbulb text-[10px]"></i> Curiosidades
                     </button>
                 </div>
 
@@ -180,12 +168,10 @@
                 </div>
 
                 <!-- BOTTOM SHEET MODAL -->
-                <div id="bottom-sheet" class="absolute bottom-0 left-0 right-0 z-40 translate-y-full transition-transform duration-300 ease-out p-4 pt-2 pointer-events-auto">
-                    <div class="glass-panel rounded-3xl p-5 border-t border-emerald-500/30 shadow-2xl relative">
-                        <div class="w-10 h-1 bg-slate-600/60 rounded-full mx-auto mb-3 cursor-pointer" onclick="closeBottomSheet()"></div>
-                        <button onclick="closeBottomSheet()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800/80 text-slate-400 flex items-center justify-center hover:text-white text-xs">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                <div id="bottom-sheet" 
+                    class="fixed bottom-0 left-0 right-0 z-50 transform translate-y-full transition-transform duration-300 ease-out max-w-lg mx-auto px-4 pb-20 pt-2 pointer-events-auto">
+                    <div class="glass-panel rounded-3xl p-5 shadow-2xl relative border border-slate-700/60 bg-slate-950/90 backdrop-blur-xl">
+                        <!-- Contenido dinámico inyectado desde JS -->
                         <div id="sheet-content"></div>
                     </div>
                 </div>
@@ -198,46 +184,27 @@
                     <div id="tab-panel-content" class="w-full flex-1"></div>
                 </div>
 
-                <!-- AR MODE OVERLAY -->
-                <div id="ar-overlay" class="absolute inset-0 bg-slate-950 z-50 hidden flex-col items-center justify-between p-6 text-center">
-                    <div class="w-full flex justify-between items-center pt-6">
-                        <span class="text-xs font-bold text-emerald-400 font-mono flex items-center gap-2">
-                            <i class="fa-solid fa-circle text-[8px] animate-ping"></i> MODO AR ACTIVO
-                        </span>
-                        <button onclick="exitARMode()" class="px-3 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
-                            Cerrar AR
-                        </button>
-                    </div>
-                    <div class="relative w-64 h-64 border-2 border-dashed border-emerald-400/40 rounded-3xl flex flex-col items-center justify-center p-4">
-                        <div class="absolute inset-0 bg-emerald-500/5 rounded-3xl"></div>
-                        <i class="fa-solid fa-camera text-4xl text-emerald-400/80 mb-3 animate-bounce"></i>
-                        <p class="text-xs text-slate-300 font-medium">Apunta tu cámara móvil hacia el árbol o especie del sendero para ver el modelo 3D en escala real.</p>
-                    </div>
-                    <div class="w-full glass-panel p-4 rounded-2xl text-left">
-                        <h4 class="text-xs font-bold text-emerald-300">Escaneo Espacial Activo</h4>
-                        <p class="text-[11px] text-slate-400 mt-1">Detección de profundidad por lidar / gaussian splatting en tiempo real.</p>
-                    </div>
-                </div>
+
 
             </div>
 
             <!-- GLASS BOTTOM NAVIGATION BAR -->
-            <nav class="w-full bg-slate-900/90 border-t border-slate-800/80 backdrop-blur-md px-4 py-2 flex justify-around items-center z-40">
-                <button onclick="switchTab('trail')" id="nav-trail" class="flex flex-col items-center gap-1 text-emerald-400 font-medium">
+           <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-panel rounded-full px-6 py-3 flex items-center gap-8 shadow-2xl border border-slate-700/50 pointer-events-auto">
+                <button id="nav-trail" onclick="switchTab('trail')" ontouchstart="switchTab('trail')" class="flex flex-col items-center gap-1 text-emerald-400 font-medium touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-compass text-base"></i>
-                    <span class="text-[10px]">Sendero 3D</span>
+                    <span class="text-[9px]">Sendero</span>
                 </button>
-                <button onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                <button id="nav-catalog" onclick="switchTab('catalog')" ontouchstart="switchTab('catalog')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-book-bookmark text-base"></i>
-                    <span class="text-[10px]">Especies</span>
+                    <span class="text-[9px]">Especies</span>
                 </button>
-                <button onclick="switchTab('audio')" id="nav-audio" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                <button id="nav-audio" onclick="switchTab('audio')" ontouchstart="switchTab('audio')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-headphones text-base"></i>
-                    <span class="text-[10px]">Audio</span>
+                    <span class="text-[9px]">Sonidos</span>
                 </button>
-                <button onclick="switchTab('quest')" id="nav-quest" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                <button id="nav-quest" onclick="switchTab('quest')" ontouchstart="switchTab('quest')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-trophy text-base"></i>
-                    <span class="text-[10px]">Logros</span>
+                    <span class="text-[9px]">Logros</span>
                 </button>
             </nav>
 
