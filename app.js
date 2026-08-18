@@ -1,0 +1,745 @@
+/* ==========================================================================
+   DATA SOURCE: SPECIES & HOTSPOTS IN THE ECOLOGICAL TRAIL
+   ========================================================================== */
+const trailData = [
+    {
+        id: 'palma_cera',
+        name: 'Palma de Cera del Quindío',
+        scientific: 'Ceroxylon quindiuense',
+        category: 'flora',
+        icon: 'fa-seedling',
+        color: '#34d399',
+        typeLabel: 'Flora Nativa',
+        image: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Árbol nacional de Colombia. Alcanza alturas de hasta 60 metros.',
+        fullDesc: 'Crece en los bosques de niebla andinos. Sus hojas proporcionan hábitat al loro orejiamarillo. Es una especie protegida debido a la deforestación histórica.',
+        conservation: 'En Peligro (EN)',
+        curiosity: 'Puede vivir más de 200 años y su tronco está cubierto por una cera impermeabilizante usada antiguamente para fabricar velas.',
+        discovered: true,
+        pos3D: { x: -2.2, y: 1.2, z: -1.5 },
+        audioFreq: 520
+    },
+    {
+        id: 'colibri_espada',
+        name: 'Colibrí Pico Espada',
+        scientific: 'Ensifera ensifera',
+        category: 'fauna',
+        icon: 'fa-dove',
+        color: '#38bdf8',
+        typeLabel: 'Avifauna',
+        image: 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Única ave en el mundo con un pico más largo que su propio cuerpo.',
+        fullDesc: 'Especializado en libar el néctar de flores tubulares como la Passiflora. Su vuelo consume gran energía, aleteando hasta 80 veces por segundo.',
+        conservation: 'Preocupación Menor (LC)',
+        curiosity: 'Debe mantener su pico apuntando hacia arriba al posarse para no perder el equilibrio.',
+        discovered: true,
+        pos3D: { x: 1.8, y: 1.8, z: -0.5 },
+        audioFreq: 880
+    },
+    {
+        id: 'orquidea_catleya',
+        name: 'Orquídea Flor de Mayo',
+        scientific: 'Cattleya trianae',
+        category: 'flora',
+        icon: 'fa-flower-tulip',
+        color: '#f472b6',
+        typeLabel: 'Flora Epífita',
+        image: 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Hermosa orquídea epífita que crece sobre los troncos húmedos.',
+        fullDesc: 'Crece sin parásitar a los árboles, absorbiendo humedad del aire y niebla del sendero. Sus colores varían del rosa pálido al violeta profundo.',
+        conservation: 'Vulnerable (VU)',
+        curiosity: 'Fue elegida flor nacional en 1936 por los vivos colores de su pétalo lipófilo central.',
+        discovered: true,
+        pos3D: { x: -0.8, y: -0.6, z: 2.1 },
+        audioFreq: 440
+    },
+    {
+        id: 'musgo_turbera',
+        name: 'Colchón de Agua (Musgo)',
+        scientific: 'Sphagnum magellanicum',
+        category: 'curiosidades',
+        icon: 'fa-lightbulb',
+        color: '#fbbf24',
+        typeLabel: 'Dato Curioso / Hidrología',
+        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Esponja natural del bosque nublado que almacena agua de lluvia.',
+        fullDesc: 'Los musgos absorben hasta 20 veces su peso seco en agua, regulando el caudal de las quebradas que nacen en la montaña durante épocas de sequía.',
+        conservation: 'Protección de Microcuenca',
+        curiosity: 'Sin esta capa vegetal, el sendero sufriría erosión severa y deslizamientos de tierra con lluvias intensas.',
+        discovered: false,
+        pos3D: { x: 2.2, y: -1.2, z: 1.2 },
+        audioFreq: 330
+    },
+    {
+        id: 'oso_anteojos',
+        name: 'Oso Andino (Rastros)',
+        scientific: 'Tremarctos ornatus',
+        category: 'fauna',
+        icon: 'fa-paw',
+        color: '#38bdf8',
+        typeLabel: 'Fauna / Mamífero',
+        image: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Marcas de garras en la corteza de los árboles del sendero.',
+        fullDesc: 'Único oso nativo de Sudamérica. Es un gran dispersor de semillas de frutos silvestres y constructor de plataformas en las copas de los árboles.',
+        conservation: 'Vulnerable (VU)',
+        curiosity: 'El patrón de manchas blancas alrededor de sus ojos es único en cada individuo, como una huella dactilar.',
+        discovered: false,
+        pos3D: { x: -1.5, y: -1.5, z: -2.0 },
+        audioFreq: 220
+    },
+    {
+        id: 'helecho_arborescente',
+        name: 'Helecho Arborescente Gigante',
+        scientific: 'Cyathea caracasana',
+        category: 'flora',
+        icon: 'fa-leaf',
+        color: '#34d399',
+        typeLabel: 'Fósil Viviente',
+        image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80',
+        shortDesc: 'Planta prehistórica que sobrevivió desde la época de los dinosaurios.',
+        fullDesc: 'No produce flores ni semillas; se reproduce por esporas microscópicas bajo sus frondas. Su tronco está formado por raíces aéreas entrelazadas.',
+        conservation: 'Protección Especial',
+        curiosity: 'Crecen extremadamente lento, apenas 1 a 2 centímetros por año.',
+        discovered: false,
+        pos3D: { x: 1.2, y: 0.8, z: -2.2 },
+        audioFreq: 600
+    }
+];
+
+/* ==========================================================================
+   THREE.JS 3D SCENE & GAUSSIAN SPLAT SIMULATION SETUP
+   ========================================================================== */
+let scene, camera, renderer, controls;
+let splatParticles, trailLineMesh, treeGroup;
+let currentFilter = 'all';
+let splatMode = false;
+
+function initThreeJS() {
+    const container = document.getElementById('three-canvas');
+    const width = container.clientWidth || 380;
+    const height = container.clientHeight || 700;
+
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x022c22, 0.12);
+
+    camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
+    camera.position.set(0, 3.5, 6);
+
+    renderer = new THREE.WebGLRenderer({ canvas: container, antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 + 0.05;
+    controls.minDistance = 2;
+    controls.maxDistance = 12;
+
+    const ambientLight = new THREE.AmbientLight(0x134e4a, 1.8);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0x6ee7b7, 2.5);
+    sunLight.position.set(5, 10, 5);
+    scene.add(sunLight);
+
+    const pointLight = new THREE.PointLight(0x34d399, 3, 10);
+    pointLight.position.set(0, 2, 0);
+    scene.add(pointLight);
+
+    createTerrainAndTrail();
+    createGaussianSplatCloud();
+    create3DTrees();
+
+    window.addEventListener('resize', onWindowResize);
+    animate();
+}
+
+function createTerrainAndTrail() {
+    const groundGeo = new THREE.PlaneGeometry(20, 20, 32, 32);
+    const pos = groundGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+        const vx = pos.getX(i);
+        const vy = pos.getY(i);
+        pos.setZ(i, Math.sin(vx * 0.5) * Math.cos(vy * 0.5) * 0.4);
+    }
+    groundGeo.computeVertexNormals();
+
+    const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x064e3b,
+        roughness: 0.9,
+        metalness: 0.1
+    });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -1.5;
+    scene.add(ground);
+
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-3, -1.3, -3),
+        new THREE.Vector3(-1.5, -1.3, -1),
+        new THREE.Vector3(0, -1.3, 0),
+        new THREE.Vector3(1.5, -1.3, 1),
+        new THREE.Vector3(2.5, -1.3, 3)
+    ]);
+
+    const points = curve.getPoints(50);
+    const trailGeo = new THREE.BufferGeometry().setFromPoints(points);
+    const trailMat = new THREE.LineBasicMaterial({ color: 0x34d399, linewidth: 3 });
+    trailLineMesh = new THREE.Line(trailGeo, trailMat);
+    scene.add(trailLineMesh);
+}
+
+function createGaussianSplatCloud() {
+    const particleCount = 2500;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+
+    const colorOptions = [
+        new THREE.Color(0x34d399),
+        new THREE.Color(0x10b981),
+        new THREE.Color(0x059669),
+        new THREE.Color(0x38bdf8),
+        new THREE.Color(0xfbbf24)
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 12;
+        positions[i * 3 + 1] = (Math.random() - 0.2) * 5 - 1;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 12;
+
+        const col = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+        colors[i * 3] = col.r;
+        colors[i * 3 + 1] = col.g;
+        colors[i * 3 + 2] = col.b;
+
+        sizes[i] = Math.random() * 0.12 + 0.04;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const particleMat = new THREE.PointsMaterial({
+        size: 0.15,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.75,
+        blending: THREE.AdditiveBlending
+    });
+
+    splatParticles = new THREE.Points(geometry, particleMat);
+    scene.add(splatParticles);
+}
+
+function create3DTrees() {
+    treeGroup = new THREE.Group();
+    const treePositions = [
+        { x: -3.5, z: -2 }, { x: 3.2, z: -3 },
+        { x: -2.8, z: 2 }, { x: 2.8, z: 2.5 },
+        { x: 0, z: -4 }
+    ];
+
+    treePositions.forEach(p => {
+        const trunkGeo = new THREE.CylinderGeometry(0.12, 0.2, 3, 8);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.set(p.x, 0, p.z);
+
+        const leavesGeo = new THREE.DodecahedronGeometry(1.2, 1);
+        const leavesMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.6 });
+        const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+        leaves.position.set(p.x, 1.8, p.z);
+
+        treeGroup.add(trunk);
+        treeGroup.add(leaves);
+    });
+
+    scene.add(treeGroup);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (splatParticles) {
+        splatParticles.rotation.y += 0.0015;
+    }
+    controls.update();
+    renderer.render(scene, camera);
+    updateHotspotsOverlay();
+}
+
+function onWindowResize() {
+    const container = document.getElementById('three-canvas');
+    if (!container) return;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+}
+
+/* ==========================================================================
+   2D FLOATING GLASS HOTSPOTS MAPPING
+   ========================================================================== */
+function updateHotspotsOverlay() {
+    const overlay = document.getElementById('hotspots-overlay');
+    if (!overlay) return;
+
+    const container = document.getElementById('three-canvas');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    let html = '';
+
+    trailData.forEach(item => {
+        if (currentFilter !== 'all' && item.category !== currentFilter) return;
+
+        const vec = new THREE.Vector3(item.pos3D.x, item.pos3D.y, item.pos3D.z);
+        vec.project(camera);
+
+        const x = (vec.x * 0.5 + 0.5) * width;
+        const y = (-vec.y * 0.5 + 0.5) * height;
+
+        if (vec.z < 1) {
+            html += `
+                <div onclick="selectHotspot('${item.id}')" 
+                     style="left: ${x}px; top: ${y}px;" 
+                     class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-20">
+                    <div class="hotspot-ring"></div>
+                    <div class="w-10 h-10 rounded-2xl glass-panel border flex items-center justify-center text-sm transition-all duration-300 transform group-hover:scale-125 shadow-xl"
+                         style="border-color: ${item.color}; color: ${item.color};">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div class="absolute left-1/2 -translate-x-1/2 top-12 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                        <div class="glass-panel px-2.5 py-1 rounded-xl text-[10px] font-bold text-slate-100 flex items-center gap-1.5 shadow-lg">
+                            <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${item.color}"></span>
+                            ${item.name}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    overlay.innerHTML = html;
+}
+
+/* ==========================================================================
+   INTERACTION & UI LOGIC
+   ========================================================================== */
+function selectHotspot(id) {
+    const item = trailData.find(x => x.id === id);
+    if (!item) return;
+
+    playSynthBeep(item.audioFreq);
+
+    const targetPos = new THREE.Vector3(item.pos3D.x, item.pos3D.y + 0.2, item.pos3D.z + 2.5);
+    smoothCameraMove(targetPos, new THREE.Vector3(item.pos3D.x, item.pos3D.y, item.pos3D.z));
+
+    const sheet = document.getElementById('bottom-sheet');
+    const content = document.getElementById('sheet-content');
+
+    content.innerHTML = `
+        <div class="flex items-start gap-3 mb-3">
+            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-2xl object-cover border border-slate-700 shadow-md">
+            <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border" style="background:${item.color}15; color:${item.color}; border-color:${item.color}40;">
+                        <i class="fa-solid ${item.icon}"></i> ${item.typeLabel}
+                    </span>
+                </div>
+                <h3 class="text-base font-bold text-slate-100 leading-snug">${item.name}</h3>
+                <p class="text-[11px] text-slate-400 italic font-mono">${item.scientific}</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed mb-3">${item.fullDesc}</p>
+
+        <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 mb-4">
+            <h4 class="text-[11px] font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                <i class="fa-solid fa-lightbulb"></i> ¿Sabías que?
+            </h4>
+            <p class="text-[11px] text-slate-300">${item.curiosity}</p>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="playSpeciesSound(${item.audioFreq})" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
+            </button>
+            <button onclick="markAsDiscovered('${item.id}')" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
+            </button>
+        </div>
+    `;
+
+    sheet.classList.remove('translate-y-full');
+}
+
+function closeBottomSheet() {
+    document.getElementById('bottom-sheet').classList.add('translate-y-full');
+}
+
+function smoothCameraMove(targetCamPos, lookAtPos) {
+    const startCamPos = camera.position.clone();
+    const duration = 1000;
+    const startTime = performance.now();
+
+    function animateCam(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        camera.position.lerpVectors(startCamPos, targetCamPos, ease);
+        controls.target.lerp(lookAtPos, ease);
+
+        if (progress < 1) {
+            requestAnimationFrame(animateCam);
+        }
+    }
+    requestAnimationFrame(animateCam);
+}
+
+function resetCamera() {
+    smoothCameraMove(new THREE.Vector3(0, 3.5, 6), new THREE.Vector3(0, 0, 0));
+    closeBottomSheet();
+}
+
+function filterCategory(cat) {
+    currentFilter = cat;
+    ['all', 'flora', 'fauna', 'curiosidades'].forEach(c => {
+        const btn = document.getElementById(`filter-${c}`);
+        if (c === cat) {
+            btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5';
+        } else {
+            btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300';
+        }
+    });
+}
+
+function toggleSplatPointMode() {
+    splatMode = !splatMode;
+    if (splatParticles) {
+        splatParticles.material.size = splatMode ? 0.35 : 0.15;
+        splatParticles.material.opacity = splatMode ? 0.95 : 0.75;
+    }
+}
+
+function markAsDiscovered(id) {
+    const item = trailData.find(x => x.id === id);
+    if (!item) return;
+
+    item.discovered = true;
+    updateDiscoveredProgress();
+
+    confetti({
+        particleCount: 60,
+        spread: 70,
+        origin: { y: 0.7 }
+    });
+
+    selectHotspot(id);
+}
+
+function updateDiscoveredProgress() {
+    const count = trailData.filter(x => x.discovered).length;
+    document.getElementById('discovered-counter').innerText = `${count} de ${trailData.length} Especies Descubiertas`;
+}
+
+/* ==========================================================================
+   TAB NAVIGATION & PANELS
+   ========================================================================== */
+function switchTab(tab) {
+    closeBottomSheet();
+    const panel = document.getElementById('tab-panel-container');
+    const content = document.getElementById('tab-panel-content');
+
+    ['trail', 'catalog', 'audio', 'quest'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (t === tab) {
+            btn.className = 'flex flex-col items-center gap-1 text-emerald-400 font-medium';
+        } else {
+            btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition';
+        }
+    });
+
+    if (tab === 'trail') {
+        panel.classList.add('hidden');
+        panel.classList.remove('flex');
+        return;
+    }
+
+    panel.classList.remove('hidden');
+    panel.classList.add('flex');
+
+    if (tab === 'catalog') {
+        content.innerHTML = `
+            <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark text-emerald-400"></i> Guía de Especies del Sendero
+            </h2>
+            <div class="space-y-3">
+                ${trailData.map(item => `
+                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition">
+                        <img src="${item.image}" class="w-14 h-14 rounded-xl object-cover">
+                        <div class="flex-1">
+                            <span class="text-[9px] uppercase font-bold text-emerald-400 block">${item.typeLabel}</span>
+                            <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
+                            <p class="text-[10px] text-slate-400 line-clamp-1">${item.shortDesc}</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (tab === 'audio') {
+        content.innerHTML = `
+            <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-headphones text-emerald-400"></i> Paisajes Sonoros & Cantos
+            </h2>
+            <div class="glass-panel rounded-2xl p-4 mb-4 text-center">
+                <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-2 border border-emerald-500/40 animate-pulse">
+                    <i class="fa-solid fa-radio"></i>
+                </div>
+                <h3 class="text-xs font-bold text-slate-100">Sintonizador del Bosque Nublado</h3>
+                <p class="text-[10px] text-slate-400 mt-1">Sintetizador binaural de fauna y viento en tiempo real.</p>
+                <button onclick="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg">
+                    Reproducir Ambiente
+                </button>
+            </div>
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
+                ${trailData.filter(x => x.category === 'fauna').map(item => `
+                    <div onclick="playSpeciesSound(${item.audioFreq})" class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-play text-emerald-400 text-lg"></i>
+                            <div>
+                                <h5 class="text-xs font-bold text-slate-200">${item.name}</h5>
+                                <span class="text-[10px] text-slate-400 font-mono">${item.scientific}</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-400">0:15</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (tab === 'quest') {
+        content.innerHTML = `
+            <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i> Desafío Eco-Explorador
+            </h2>
+            <div class="glass-panel rounded-2xl p-4 mb-4 border-amber-500/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-slate-200">Insignia: Guardián del Sendero</span>
+                    <span class="text-xs font-bold text-amber-400">${trailData.filter(x => x.discovered).length} / ${trailData.length}</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                    <div class="bg-gradient-to-r from-emerald-400 to-amber-400 h-full transition-all duration-500" style="width: ${(trailData.filter(x => x.discovered).length / trailData.length) * 100}%"></div>
+                </div>
+            </div>
+            <div class="space-y-2">
+                ${trailData.map(item => `
+                    <div class="glass-panel p-3 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg ${item.discovered ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-slate-800 text-slate-600'} flex items-center justify-center text-xs">
+                                <i class="fa-solid ${item.discovered ? 'fa-check' : 'fa-lock'}"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold ${item.discovered ? 'text-slate-100' : 'text-slate-500'}">${item.name}</h5>
+                                <span class="text-[10px] text-slate-400">${item.typeLabel}</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold ${item.discovered ? 'text-emerald-400' : 'text-slate-600'}">
+                            ${item.discovered ? '+50 PTS' : 'Bloqueado'}
+                        </span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+}
+
+function closeTabPanel() {
+    document.getElementById('tab-panel-container').classList.add('hidden');
+    switchTab('trail');
+}
+
+/* ==========================================================================
+   WEB AUDIO SYNTHESIZER
+   ========================================================================== */
+let audioCtx;
+let isAudioPlaying = false;
+let windNoiseNode;
+
+function initAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function toggleAudio() {
+    initAudioContext();
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    isAudioPlaying = !isAudioPlaying;
+    const btn = document.getElementById('ambient-audio-btn');
+    const icon = document.getElementById('audio-icon');
+
+    if (isAudioPlaying) {
+        icon.className = 'fa-solid fa-volume-high text-emerald-400';
+        btn.classList.add('bg-emerald-500/30');
+        startForestSound();
+    } else {
+        icon.className = 'fa-solid fa-volume-xmark';
+        btn.classList.remove('bg-emerald-500/30');
+        stopForestSound();
+    }
+}
+
+function startForestSound() {
+    if (!audioCtx) return;
+    const bufferSize = audioCtx.sampleRate * 2;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+
+    windNoiseNode = audioCtx.createBufferSource();
+    windNoiseNode.buffer = noiseBuffer;
+    windNoiseNode.loop = true;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(300, audioCtx.currentTime);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+
+    windNoiseNode.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    windNoiseNode.start();
+}
+
+function stopForestSound() {
+    if (windNoiseNode) {
+        windNoiseNode.stop();
+    }
+}
+
+function playSynthBeep(freq = 440) {
+    initAudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.15);
+
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playSpeciesSound(freq) {
+    initAudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq + Math.random() * 200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq + 400, audioCtx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }, i * 120);
+    }
+}
+
+/* ==========================================================================
+   MODALS & VIEWPORT TOGGLES
+   ========================================================================== */
+let isPhoneView = true;
+
+function toggleViewMode() {
+    isPhoneView = !isPhoneView;
+    const container = document.getElementById('phone-container');
+    const text = document.getElementById('view-mode-text');
+
+    if (isPhoneView) {
+        container.className = 'phone-mockup relative w-[380px] h-[780px] bg-slate-950 overflow-hidden flex flex-col border-4 border-slate-800 transition-all duration-500';
+        text.innerText = 'Modo Teléfono';
+    } else {
+        container.className = 'relative w-full max-w-4xl h-[780px] rounded-3xl bg-slate-950 overflow-hidden flex flex-col border border-slate-800 transition-all duration-500 shadow-2xl';
+        text.innerText = 'Modo Expandido';
+    }
+
+    setTimeout(onWindowResize, 300);
+}
+
+function triggerARMode() {
+    document.getElementById('ar-overlay').classList.remove('hidden');
+    document.getElementById('ar-overlay').classList.add('flex');
+}
+
+function exitARMode() {
+    document.getElementById('ar-overlay').classList.add('hidden');
+    document.getElementById('ar-overlay').classList.remove('flex');
+}
+
+function openSearchModal() {
+    document.getElementById('search-modal').classList.remove('hidden');
+    document.getElementById('search-modal').classList.add('flex');
+    document.getElementById('search-input').focus();
+    handleSearch();
+}
+
+function closeSearchModal() {
+    document.getElementById('search-modal').classList.add('hidden');
+    document.getElementById('search-modal').classList.remove('flex');
+}
+
+function handleSearch() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const results = document.getElementById('search-results');
+
+    const filtered = trailData.filter(x => x.name.toLowerCase().includes(query) || x.scientific.toLowerCase().includes(query));
+
+    results.innerHTML = filtered.map(item => `
+        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50">
+            <div>
+                <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">${item.scientific}</p>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-emerald-400"></i>
+        </div>
+    `).join('');
+}
+
+window.onload = () => {
+    initThreeJS();
+    updateDiscoveredProgress();
+};

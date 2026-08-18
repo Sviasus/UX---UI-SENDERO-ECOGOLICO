@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sendero Ecológico 3D - App Móvil Interactive</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Canvas Confetti for Gamification -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            900: '#064e3b',
+                            950: '#022c22'
+                        },
+                        glass: {
+                            bg: 'rgba(15, 23, 42, 0.65)',
+                            border: 'rgba(255, 255, 255, 0.12)',
+                            active: 'rgba(52, 211, 153, 0.2)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-2 sm:p-6 overflow-x-hidden select-none font-sans">
+
+    <!-- Top Control Bar (Device Switcher & Options) -->
+    <header class="w-full max-w-5xl mb-4 flex flex-wrap justify-between items-center px-4 py-2 bg-slate-900/60 rounded-2xl border border-slate-800 backdrop-blur-md gap-3 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                <i class="fa-solid fa-mountain-sun text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    Sendero Ecológico 3D 
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">Gaussian Splatting</span>
+                </h1>
+                <p class="text-xs text-slate-400">Prototipo Interactivo Móvil • Glassmorphic UI</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Toggle View Mode -->
+            <button id="view-mode-btn" onclick="toggleViewMode()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition flex items-center gap-2">
+                <i class="fa-solid fa-mobile-screen"></i>
+                <span id="view-mode-text">Modo Teléfono</span>
+            </button>
+
+            <!-- Audio Ambient Toggle -->
+            <button id="ambient-audio-btn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-medium text-emerald-300 transition flex items-center gap-2">
+                <i id="audio-icon" class="fa-solid fa-volume-xmark"></i>
+                <span id="audio-status-text">Sonido Bosque</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container Frame -->
+    <main id="app-wrapper" class="relative transition-all duration-500 ease-out flex items-center justify-center w-full">
+        
+        <!-- Mobile Phone Mockup Window -->
+        <div id="phone-container" class="phone-mockup relative w-[380px] h-[780px] bg-slate-950 overflow-hidden flex flex-col border-4 border-slate-800 transition-all duration-500">
+            
+            <!-- Mobile Dynamic Island / Notch -->
+            <div class="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-5 bg-slate-900 rounded-full z-50 flex items-center justify-between px-2.5 border border-slate-800">
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-700"></div>
+                <div class="w-2 h-2 rounded-full bg-emerald-500/60 animate-pulse"></div>
+            </div>
+
+            <!-- Mobile Status Bar -->
+            <div class="w-full px-6 pt-3 pb-1 flex justify-between items-center text-[11px] text-slate-300 z-40 select-none font-medium">
+                <span>09:41</span>
+                <div class="flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-signal text-[10px]"></i>
+                    <i class="fa-solid fa-wifi text-[10px]"></i>
+                    <i class="fa-solid fa-battery-full text-emerald-400"></i>
+                </div>
+            </div>
+
+            <!-- VIEWPORT 3D (PLAYCANVAS / GAUSSIAN SPLAT SIMULATION CANVAS) -->
+            <div class="relative flex-1 w-full h-full overflow-hidden">
+                <!-- 3D Canvas -->
+                <canvas id="three-canvas" class="w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing"></canvas>
+                
+                <!-- Splat Vignette & Ambient Glow Overlay -->
+                <div class="absolute inset-0 splat-vignette"></div>
+
+                <!-- 3D Viewport Controls (Overlay Buttons) -->
+                <div class="absolute top-14 right-4 flex flex-col gap-2 z-30">
+                    <button onclick="resetCamera()" title="Reiniciar Cámara" class="w-8 h-8 rounded-full glass-panel flex items-center justify-center text-slate-200 hover:text-emerald-400 text-xs transition">
+                        <i class="fa-solid fa-compass"></i>
+                    </button>
+                    <button onclick="toggleSplatPointMode()" title="Modo Nube de Puntos Gaussianos" class="w-8 h-8 rounded-full glass-panel flex items-center justify-center text-slate-200 hover:text-emerald-400 text-xs transition">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                    </button>
+                    <button onclick="triggerARMode()" title="Modo Realidad Aumentada (AR)" class="w-8 h-8 rounded-full glass-panel flex items-center justify-center text-slate-200 hover:text-emerald-400 text-xs transition">
+                        <i class="fa-solid fa-vr-cardboard"></i>
+                    </button>
+                </div>
+
+                <!-- App Top Header Overlay (Glassmorphism) -->
+                <div class="absolute top-12 left-4 right-14 z-30">
+                    <div class="glass-panel rounded-2xl p-2.5 px-3.5 flex items-center justify-between shadow-lg">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-bold text-sm shadow-md">
+                                <i class="fa-solid fa-tree"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xs font-bold text-slate-100 leading-tight">Sendero El Bosque</h2>
+                                <p class="text-[10px] text-emerald-300 font-medium flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                    Bosque Nublado • 18°C
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="openSearchModal()" class="w-7 h-7 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center justify-center text-slate-300 text-xs hover:text-emerald-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Filters (Floating Glass Pills) -->
+                <div class="absolute top-28 left-0 right-0 z-30 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 py-1">
+                    <button onclick="filterCategory('all')" id="filter-all" class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-border-all"></i> Todo
+                    </button>
+                    <button onclick="filterCategory('flora')" id="filter-flora" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300">
+                        <i class="fa-solid fa-seedling text-emerald-400"></i> Flora
+                    </button>
+                    <button onclick="filterCategory('fauna')" id="filter-fauna" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-sky-300">
+                        <i class="fa-solid fa-dove text-sky-400"></i> Aves
+                    </button>
+                    <button onclick="filterCategory('curiosidades')" id="filter-curiosidades" class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-amber-300">
+                        <i class="fa-solid fa-lightbulb text-amber-400"></i> Datos
+                    </button>
+                </div>
+
+                <!-- DYNAMIC FLOATING GLASS HOTSPOTS CONTAINER -->
+                <div id="hotspots-overlay" class="absolute inset-0 pointer-events-none z-20"></div>
+
+                <!-- Bottom Floating Mini Banner (GPS Trail Progress) -->
+                <div class="absolute bottom-20 left-4 right-4 z-30">
+                    <div class="glass-panel rounded-2xl p-2.5 px-3 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i class="fa-solid fa-location-arrow text-xs"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Progreso Sendero</span>
+                                <span class="text-xs font-semibold text-slate-200" id="discovered-counter">3 de 6 Especies Descubiertas</span>
+                            </div>
+                        </div>
+                        <button onclick="switchTab('quest')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold hover:bg-emerald-500/30">
+                            Ver Logros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BOTTOM SHEET MODAL -->
+                <div id="bottom-sheet" class="absolute bottom-0 left-0 right-0 z-40 translate-y-full transition-transform duration-300 ease-out p-4 pt-2 pointer-events-auto">
+                    <div class="glass-panel rounded-3xl p-5 border-t border-emerald-500/30 shadow-2xl relative">
+                        <div class="w-10 h-1 bg-slate-600/60 rounded-full mx-auto mb-3 cursor-pointer" onclick="closeBottomSheet()"></div>
+                        <button onclick="closeBottomSheet()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800/80 text-slate-400 flex items-center justify-center hover:text-white text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div id="sheet-content"></div>
+                    </div>
+                </div>
+
+                <!-- TAB PANELS OVERLAY -->
+                <div id="tab-panel-container" class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl z-40 hidden flex-col p-4 pt-12 overflow-y-auto no-scrollbar">
+                    <button onclick="closeTabPanel()" class="absolute top-12 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div id="tab-panel-content" class="w-full flex-1"></div>
+                </div>
+
+                <!-- AR MODE OVERLAY -->
+                <div id="ar-overlay" class="absolute inset-0 bg-slate-950 z-50 hidden flex-col items-center justify-between p-6 text-center">
+                    <div class="w-full flex justify-between items-center pt-6">
+                        <span class="text-xs font-bold text-emerald-400 font-mono flex items-center gap-2">
+                            <i class="fa-solid fa-circle text-[8px] animate-ping"></i> MODO AR ACTIVO
+                        </span>
+                        <button onclick="exitARMode()" class="px-3 py-1 rounded-full bg-slate-800 text-xs text-slate-300 border border-slate-700">
+                            Cerrar AR
+                        </button>
+                    </div>
+                    <div class="relative w-64 h-64 border-2 border-dashed border-emerald-400/40 rounded-3xl flex flex-col items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-emerald-500/5 rounded-3xl"></div>
+                        <i class="fa-solid fa-camera text-4xl text-emerald-400/80 mb-3 animate-bounce"></i>
+                        <p class="text-xs text-slate-300 font-medium">Apunta tu cámara móvil hacia el árbol o especie del sendero para ver el modelo 3D en escala real.</p>
+                    </div>
+                    <div class="w-full glass-panel p-4 rounded-2xl text-left">
+                        <h4 class="text-xs font-bold text-emerald-300">Escaneo Espacial Activo</h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Detección de profundidad por lidar / gaussian splatting en tiempo real.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- GLASS BOTTOM NAVIGATION BAR -->
+            <nav class="w-full bg-slate-900/90 border-t border-slate-800/80 backdrop-blur-md px-4 py-2 flex justify-around items-center z-40">
+                <button onclick="switchTab('trail')" id="nav-trail" class="flex flex-col items-center gap-1 text-emerald-400 font-medium">
+                    <i class="fa-solid fa-compass text-base"></i>
+                    <span class="text-[10px]">Sendero 3D</span>
+                </button>
+                <button onclick="switchTab('catalog')" id="nav-catalog" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-book-bookmark text-base"></i>
+                    <span class="text-[10px]">Especies</span>
+                </button>
+                <button onclick="switchTab('audio')" id="nav-audio" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-headphones text-base"></i>
+                    <span class="text-[10px]">Audio</span>
+                </button>
+                <button onclick="switchTab('quest')" id="nav-quest" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-trophy text-base"></i>
+                    <span class="text-[10px]">Logros</span>
+                </button>
+            </nav>
+
+            <!-- Home Indicator Bar -->
+            <div class="w-full py-1 bg-slate-900 flex justify-center">
+                <div class="w-32 h-1 bg-slate-700/60 rounded-full"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SEARCH MODAL -->
+    <div id="search-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-5 border border-slate-700 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-emerald-400"></i> Buscar en el Sendero
+                </h3>
+                <button onclick="closeSearchModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Ej. Palma de cera, Colibrí, Musgo..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-400 mb-4">
+            <div id="search-results" class="space-y-2 max-h-60 overflow-y-auto no-scrollbar"></div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
