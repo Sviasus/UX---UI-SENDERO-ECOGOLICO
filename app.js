@@ -41,7 +41,7 @@ const trailData = [
         name: 'Orquídea Flor de Mayo',
         scientific: 'Cattleya trianae',
         category: 'flora',
-        icon: 'fa-flower-tulip',
+        icon: 'fa-leaf',
         color: '#f472b6',
         typeLabel: 'Flora Epífita',
         image: 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=600&q=80',
@@ -92,7 +92,7 @@ const trailData = [
         name: 'Helecho Arborescente Gigante',
         scientific: 'Cyathea caracasana',
         category: 'flora',
-        icon: 'fa-leaf',
+        icon: 'fa-seedling',
         color: '#34d399',
         typeLabel: 'Fósil Viviente',
         image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80',
@@ -107,15 +107,15 @@ const trailData = [
 ];
 
 /* ==========================================================================
-   THREE.JS 3D SCENE & GAUSSIAN SPLAT SIMULATION SETUP
+   THREE.JS 3D SCENE SETUP
    ========================================================================== */
 let scene, camera, renderer, controls;
 let splatParticles, trailLineMesh, treeGroup;
 let currentFilter = 'all';
-let splatMode = false;
 
 function initThreeJS() {
     const container = document.getElementById('three-canvas');
+    if (!container) return;
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
@@ -149,7 +149,7 @@ function initThreeJS() {
     scene.add(pointLight);
 
     createTerrainAndTrail();
-    createGaussianSplatCloud();
+    createParticlesCloud();
     create3DTrees();
 
     window.addEventListener('resize', onWindowResize);
@@ -192,19 +192,16 @@ function createTerrainAndTrail() {
     scene.add(trailLineMesh);
 }
 
-function createGaussianSplatCloud() {
-    const particleCount = 2500;
+function createParticlesCloud() {
+    const particleCount = 2000;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    const sizes = new Float32Array(particleCount);
 
     const colorOptions = [
         new THREE.Color(0x34d399),
         new THREE.Color(0x10b981),
-        new THREE.Color(0x059669),
-        new THREE.Color(0x38bdf8),
-        new THREE.Color(0xfbbf24)
+        new THREE.Color(0x38bdf8)
     ];
 
     for (let i = 0; i < particleCount; i++) {
@@ -216,19 +213,16 @@ function createGaussianSplatCloud() {
         colors[i * 3] = col.r;
         colors[i * 3 + 1] = col.g;
         colors[i * 3 + 2] = col.b;
-
-        sizes[i] = Math.random() * 0.12 + 0.04;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
     const particleMat = new THREE.PointsMaterial({
-        size: 0.15,
+        size: 0.12,
         vertexColors: true,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.7,
         blending: THREE.AdditiveBlending
     });
 
@@ -265,16 +259,16 @@ function create3DTrees() {
 function animate() {
     requestAnimationFrame(animate);
     if (splatParticles) {
-        splatParticles.rotation.y += 0.0015;
+        splatParticles.rotation.y += 0.0012;
     }
-    controls.update();
-    renderer.render(scene, camera);
+    if (controls) controls.update();
+    if (renderer && scene && camera) renderer.render(scene, camera);
     updateHotspotsOverlay();
 }
 
 function onWindowResize() {
     const container = document.getElementById('three-canvas');
-    if (!container) return;
+    if (!container || !camera || !renderer) return;
     const width = container.clientWidth;
     const height = container.clientHeight;
 
@@ -284,11 +278,11 @@ function onWindowResize() {
 }
 
 /* ==========================================================================
-   2D FLOATING GLASS HOTSPOTS MAPPING (MOBILE TOUCH OPTIMIZED)
+   2D HOTSPOTS MAPPING (MOBILE & PC COMPATIBLE)
    ========================================================================== */
 function updateHotspotsOverlay() {
     const overlay = document.getElementById('hotspots-overlay');
-    if (!overlay) return;
+    if (!overlay || !camera) return;
 
     const container = document.getElementById('three-canvas');
     const width = container.clientWidth;
@@ -313,7 +307,7 @@ function updateHotspotsOverlay() {
                      class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-30 touch-manipulation">
                     <div class="hotspot-ring"></div>
                     <div class="w-10 h-10 rounded-2xl glass-panel border flex items-center justify-center text-sm transition-all duration-300 transform group-hover:scale-125 shadow-xl"
-                         style="border-color: ${item.color}; color: ${item.color};">
+                         style="border-color: ${item.color}; color: ${item.color}; background: rgba(15, 23, 42, 0.85);">
                         <i class="fa-solid ${item.icon}"></i>
                     </div>
                     <div class="absolute left-1/2 -translate-x-1/2 top-12 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
@@ -337,7 +331,7 @@ function selectHotspot(id) {
     const item = trailData.find(x => x.id === id);
     if (!item) return;
 
-    playSynthBeep(item.audioFreq);
+    playSynthBeep(item.audioFreq || 440);
 
     const targetPos = new THREE.Vector3(item.pos3D.x, item.pos3D.y + 0.2, item.pos3D.z + 2.5);
     smoothCameraMove(targetPos, new THREE.Vector3(item.pos3D.x, item.pos3D.y, item.pos3D.z));
@@ -345,36 +339,47 @@ function selectHotspot(id) {
     const sheet = document.getElementById('bottom-sheet');
     const content = document.getElementById('sheet-content');
 
+    if (!sheet || !content) return;
+
     content.innerHTML = `
-        <div class="flex items-start gap-3 mb-3">
-            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-2xl object-cover border border-slate-700 shadow-md">
-            <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border" style="background:${item.color}15; color:${item.color}; border-color:${item.color}40;">
-                        <i class="fa-solid ${item.icon}"></i> ${item.typeLabel}
-                    </span>
+        <div class="relative">
+            <button onclick="closeBottomSheet()" ontouchstart="closeBottomSheet()" 
+                    class="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition border border-slate-700 z-50 touch-manipulation">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-start gap-3 mb-3 pr-8">
+                <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-2xl object-cover border border-slate-700 shadow-md">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border" style="background:${item.color}15; color:${item.color}; border-color:${item.color}40;">
+                            <i class="fa-solid ${item.icon}"></i> ${item.typeLabel}
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-100 leading-snug">${item.name}</h3>
+                    <p class="text-[11px] text-slate-400 italic font-mono">${item.scientific}</p>
                 </div>
-                <h3 class="text-base font-bold text-slate-100 leading-snug">${item.name}</h3>
-                <p class="text-[11px] text-slate-400 italic font-mono">${item.scientific}</p>
             </div>
-        </div>
 
-        <p class="text-xs text-slate-300 leading-relaxed mb-3">${item.fullDesc}</p>
+            <p class="text-xs text-slate-300 leading-relaxed mb-3">${item.fullDesc}</p>
 
-        <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 mb-4">
-            <h4 class="text-[11px] font-bold text-amber-400 flex items-center gap-1.5 mb-1">
-                <i class="fa-solid fa-lightbulb"></i> ¿Sabías que?
-            </h4>
-            <p class="text-[11px] text-slate-300">${item.curiosity}</p>
-        </div>
+            <div class="bg-slate-900/80 rounded-2xl p-3 border border-slate-800 mb-4">
+                <h4 class="text-[11px] font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                    <i class="fa-solid fa-lightbulb"></i> ¿Sabías que?
+                </h4>
+                <p class="text-[11px] text-slate-300">${item.curiosity}</p>
+            </div>
 
-        <div class="flex gap-2">
-            <button onclick="playSpeciesSound(${item.audioFreq})" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation">
-                <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
-            </button>
-            <button onclick="markAsDiscovered('${item.id}')" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation">
-                <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
-            </button>
+            <div class="flex gap-2">
+                <button onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq})"
+                        class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation">
+                    <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
+                </button>
+                <button onclick="markAsDiscovered('${item.id}')" ontouchstart="markAsDiscovered('${item.id}')"
+                        class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation">
+                    <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
+                </button>
+            </div>
         </div>
     `;
 
@@ -382,10 +387,12 @@ function selectHotspot(id) {
 }
 
 function closeBottomSheet() {
-    document.getElementById('bottom-sheet').classList.add('translate-y-full');
+    const sheet = document.getElementById('bottom-sheet');
+    if (sheet) sheet.classList.add('translate-y-full');
 }
 
 function smoothCameraMove(targetCamPos, lookAtPos) {
+    if (!camera || !controls) return;
     const startCamPos = camera.position.clone();
     const duration = 1000;
     const startTime = performance.now();
@@ -414,20 +421,15 @@ function filterCategory(cat) {
     currentFilter = cat;
     ['all', 'flora', 'fauna', 'curiosidades'].forEach(c => {
         const btn = document.getElementById(`filter-${c}`);
-        if (c === cat) {
-            btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 touch-manipulation';
-        } else {
-            btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 touch-manipulation';
+        if (btn) {
+            if (c === cat) {
+                btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 touch-manipulation cursor-pointer';
+            } else {
+                btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 touch-manipulation cursor-pointer';
+            }
         }
     });
-}
-
-function toggleSplatPointMode() {
-    splatMode = !splatMode;
-    if (splatParticles) {
-        splatParticles.material.size = splatMode ? 0.35 : 0.15;
-        splatParticles.material.opacity = splatMode ? 0.95 : 0.75;
-    }
+    updateHotspotsOverlay();
 }
 
 function markAsDiscovered(id) {
@@ -437,11 +439,13 @@ function markAsDiscovered(id) {
     item.discovered = true;
     updateDiscoveredProgress();
 
-    confetti({
-        particleCount: 60,
-        spread: 70,
-        origin: { y: 0.7 }
-    });
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 60,
+            spread: 70,
+            origin: { y: 0.7 }
+        });
+    }
 
     selectHotspot(id);
 }
@@ -462,13 +466,15 @@ function switchTab(tab) {
     const panel = document.getElementById('tab-panel-container');
     const content = document.getElementById('tab-panel-content');
 
+    if (!panel || !content) return;
+
     ['trail', 'catalog', 'audio', 'quest'].forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (btn) {
             if (t === tab) {
-                btn.className = 'flex flex-col items-center gap-1 text-emerald-400 font-medium touch-manipulation';
+                btn.className = 'flex flex-col items-center gap-1 text-emerald-400 font-medium touch-manipulation cursor-pointer';
             } else {
-                btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation';
+                btn.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition touch-manipulation cursor-pointer';
             }
         }
     });
@@ -489,7 +495,8 @@ function switchTab(tab) {
             </h2>
             <div class="space-y-3">
                 ${trailData.map(item => `
-                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition touch-manipulation">
+                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" ontouchstart="selectHotspot('${item.id}'); closeTabPanel();" 
+                         class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition touch-manipulation">
                         <img src="${item.image}" class="w-14 h-14 rounded-xl object-cover">
                         <div class="flex-1">
                             <span class="text-[9px] uppercase font-bold text-emerald-400 block">${item.typeLabel}</span>
@@ -512,14 +519,15 @@ function switchTab(tab) {
                 </div>
                 <h3 class="text-xs font-bold text-slate-100">Sintonizador del Bosque Nublado</h3>
                 <p class="text-[10px] text-slate-400 mt-1">Sintetizador binaural de fauna y viento en tiempo real.</p>
-                <button onclick="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation">
+                <button onclick="toggleAudio()" ontouchstart="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation">
                     Reproducir Ambiente
                 </button>
             </div>
             <div class="space-y-2">
                 <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
                 ${trailData.filter(x => x.category === 'fauna').map(item => `
-                    <div onclick="playSpeciesSound(${item.audioFreq})" class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60 touch-manipulation">
+                    <div onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq})" 
+                         class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60 touch-manipulation">
                         <div class="flex items-center gap-2.5">
                             <i class="fa-solid fa-circle-play text-emerald-400 text-lg"></i>
                             <div>
@@ -533,6 +541,10 @@ function switchTab(tab) {
             </div>
         `;
     } else if (tab === 'quest') {
+        const discoveredCount = trailData.filter(x => x.discovered).length;
+        const totalCount = trailData.length;
+        const progressPercent = Math.round((discoveredCount / totalCount) * 100);
+
         content.innerHTML = `
             <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
                 <i class="fa-solid fa-trophy text-amber-400"></i> Desafío Eco-Explorador
@@ -540,11 +552,12 @@ function switchTab(tab) {
             <div class="glass-panel rounded-2xl p-4 mb-4 border-amber-500/30">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs font-bold text-slate-200">Insignia: Guardián del Sendero</span>
-                    <span class="text-xs font-bold text-amber-400">${trailData.filter(x => x.discovered).length} / ${trailData.length}</span>
+                    <span class="text-xs font-bold text-amber-400">${discoveredCount} / ${totalCount}</span>
                 </div>
-                <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-                    <div class="bg-gradient-to-r from-emerald-400 to-amber-400 h-full transition-all duration-500" style="width: ${(trailData.filter(x => x.discovered).length / trailData.length) * 100}%"></div>
+                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 mb-2">
+                    <div class="bg-gradient-to-r from-emerald-400 to-amber-400 h-full transition-all duration-500" style="width: ${progressPercent}%"></div>
                 </div>
+                <p class="text-[10px] text-slate-400 text-right font-mono">${progressPercent}% Completado</p>
             </div>
             <div class="space-y-2">
                 ${trailData.map(item => `
@@ -569,12 +582,13 @@ function switchTab(tab) {
 }
 
 function closeTabPanel() {
-    document.getElementById('tab-panel-container').classList.add('hidden');
+    const panel = document.getElementById('tab-panel-container');
+    if (panel) panel.classList.add('hidden');
     switchTab('trail');
 }
 
 /* ==========================================================================
-   WEB AUDIO SYNTHESIZER (DESBLOQUEO AUTOMÁTICO EN MÓVILES)
+   WEB AUDIO SYNTHESIZER (MOBIL COMPATIBLE)
    ========================================================================== */
 let audioCtx;
 let isAudioPlaying = false;
@@ -589,14 +603,11 @@ function initAudioContext() {
     }
 }
 
-// Escuchador global para desbloquear el audio en el primer toque del celular
 function unlockMobileAudio() {
     initAudioContext();
-    window.removeEventListener('touchstart', unlockMobileAudio);
-    window.removeEventListener('click', unlockMobileAudio);
 }
-window.addEventListener('touchstart', unlockMobileAudio, { once: true });
-window.addEventListener('click', unlockMobileAudio, { once: true });
+window.addEventListener('touchstart', unlockMobileAudio, { passive: true });
+window.addEventListener('click', unlockMobileAudio, { passive: true });
 
 function toggleAudio() {
     initAudioContext();
@@ -651,99 +662,91 @@ function stopForestSound() {
 
 function playSynthBeep(freq = 440) {
     initAudioContext();
+    if (!audioCtx) return;
 
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.15);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.15);
 
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
 
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) {}
 }
 
 function playSpeciesSound(freq) {
     initAudioContext();
+    if (!audioCtx) return;
+
+    const targetFreq = freq || 500;
 
     for (let i = 0; i < 3; i++) {
         setTimeout(() => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq + Math.random() * 200, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(freq + 400, audioCtx.currentTime + 0.08);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(targetFreq + Math.random() * 150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(targetFreq + 350, audioCtx.currentTime + 0.09);
 
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
 
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.08);
-        }, i * 120);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.09);
+            } catch(e) {}
+        }, i * 110);
     }
 }
 
 /* ==========================================================================
-   MODALS & VIEWPORT TOGGLES
+   MODALS & SEARCH
    ========================================================================== */
-let isPhoneView = true;
-
-function toggleViewMode() {
-    isPhoneView = !isPhoneView;
-    const container = document.getElementById('phone-container');
-    const text = document.getElementById('view-mode-text');
-
-    if (isPhoneView) {
-        container.className = 'phone-mockup relative w-[380px] h-[780px] bg-slate-950 overflow-hidden flex flex-col border-4 border-slate-800 transition-all duration-500';
-        if (text) text.innerText = 'Modo Teléfono';
-    } else {
-        container.className = 'relative w-full max-w-4xl h-[780px] rounded-3xl bg-slate-950 overflow-hidden flex flex-col border border-slate-800 transition-all duration-500 shadow-2xl';
-        if (text) text.innerText = 'Modo Expandido';
-    }
-
-    setTimeout(onWindowResize, 300);
-}
-
-function triggerARMode() {
-    document.getElementById('ar-overlay').classList.remove('hidden');
-    document.getElementById('ar-overlay').classList.add('flex');
-}
-
-function exitARMode() {
-    document.getElementById('ar-overlay').classList.add('hidden');
-    document.getElementById('ar-overlay').classList.remove('flex');
-}
-
 function openSearchModal() {
-    document.getElementById('search-modal').classList.remove('hidden');
-    document.getElementById('search-modal').classList.add('flex');
-    document.getElementById('search-input').focus();
-    handleSearch();
+    const modal = document.getElementById('search-modal');
+    const input = document.getElementById('search-input');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    if (input) {
+        input.focus();
+        handleSearch();
+    }
 }
 
 function closeSearchModal() {
-    document.getElementById('search-modal').classList.add('hidden');
-    document.getElementById('search-modal').classList.remove('flex');
+    const modal = document.getElementById('search-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 function handleSearch() {
-    const query = document.getElementById('search-input').value.toLowerCase();
+    const input = document.getElementById('search-input');
     const results = document.getElementById('search-results');
+    if (!input || !results) return;
 
+    const query = input.value.toLowerCase();
     const filtered = trailData.filter(x => x.name.toLowerCase().includes(query) || x.scientific.toLowerCase().includes(query));
 
     results.innerHTML = filtered.map(item => `
-        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 touch-manipulation">
+        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" ontouchstart="selectHotspot('${item.id}'); closeSearchModal();"
+             class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 touch-manipulation">
             <div>
                 <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
                 <p class="text-[10px] text-slate-400 font-mono">${item.scientific}</p>
