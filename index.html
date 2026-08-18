@@ -125,7 +125,7 @@
                 </div>
 
                 <!-- BARRA DE FILTRADO FIJA SUPERIOR -->
-                <div class="absolute top-24 left-1/2 -translate-x-1/2 z-40 w-auto max-w-[92vw] pointer-events-auto">
+                <div class="absolute top-24 left-4 right-4 z-40 w-auto pointer-events-auto">
                     <div class="glass-panel rounded-full px-3 py-1.5 flex items-center gap-2 overflow-x-auto no-scrollbar border border-slate-700/60 shadow-xl bg-slate-950/80 backdrop-blur-md">
                         <button id="filter-all" onclick="filterCategory('all')" ontouchstart="filterCategory('all'); event.preventDefault();" 
                                 class="glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer touch-manipulation">
@@ -141,9 +141,10 @@
                         </button>
                         <button id="filter-curiosidades" onclick="filterCategory('curiosidades')" ontouchstart="filterCategory('curiosidades')" 
                                 class="glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 cursor-pointer touch-manipulation">
-                            <i class="fa-solid fa-lightbulb text-[10px]"></i> Curiosidades
+                            <i class="fa-solid fa-lightbulb text-[10px]"></i> Datos
                         </button>
                     </div>
+                    
                 </div>
                 <!-- DYNAMIC FLOATING GLASS HOTSPOTS CONTAINER -->
                 <div id="hotspots-overlay" class="absolute inset-0 pointer-events-none z-20"></div>
@@ -188,7 +189,8 @@
             </div>
 
             <!-- GLASS BOTTOM NAVIGATION BAR -->
-           <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-panel rounded-full px-6 py-3 flex items-center gap-8 shadow-2xl border border-slate-700/50 pointer-events-auto">
+           
+            <nav class="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 glass-panel rounded-full px-6 py-3 flex items-center gap-8 shadow-2xl border border-slate-700/50 pointer-events-auto">
                 <button id="nav-trail" onclick="switchTab('trail')" ontouchstart="switchTab('trail')" class="flex flex-col items-center gap-1 text-emerald-400 font-medium touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-compass text-base"></i>
                     <span class="text-[9px]">Sendero</span>

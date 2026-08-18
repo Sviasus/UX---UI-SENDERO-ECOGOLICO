@@ -120,7 +120,9 @@ function initThreeJS() {
     const height = container.clientHeight || window.innerHeight;
 
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x022c22, 0.12);
+    // 1. Color de fondo del cielo (Azul cielo diurno) y la niebla que se funde con el horizonte
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.FogExp2(0x87ceeb, 0.05);
 
     camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
     camera.position.set(0, 3.5, 6);
@@ -137,14 +139,17 @@ function initThreeJS() {
     controls.minDistance = 2;
     controls.maxDistance = 12;
 
-    const ambientLight = new THREE.AmbientLight(0x134e4a, 1.8);
+    // 2. Luz ambiental clara y luminosa simulando la luz rebotada del cielo diurno
+    const ambientLight = new THREE.AmbientLight(0xd9f99d, 1.2);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0x6ee7b7, 2.5);
-    sunLight.position.set(5, 10, 5);
+    // 3. Sol brillante y cálido desde arriba
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    sunLight.position.set(5, 12, 5);
     scene.add(sunLight);
 
-    const pointLight = new THREE.PointLight(0x34d399, 3, 10);
+    // 4. Luz de realce suave para los elementos del suelo
+    const pointLight = new THREE.PointLight(0xfef08a, 2, 10);
     pointLight.position.set(0, 2, 0);
     scene.add(pointLight);
 
@@ -232,20 +237,37 @@ function createParticlesCloud() {
 
 function create3DTrees() {
     treeGroup = new THREE.Group();
+    
+    // Lista original y 5 nuevas posiciones más lejanas (z más alto en negativo o positivo)
     const treePositions = [
         { x: -3.5, z: -2 }, { x: 3.2, z: -3 },
         { x: -2.8, z: 2 }, { x: 2.8, z: 2.5 },
-        { x: 0, z: -4 }
+        { x: 0, z: -4 },
+        // Nuevos árboles más lejos
+        { x: -6.0, z: -7.0 }, { x: 6.0, z: -7.0 }, 
+        { x: -8.0, z: 0 }, { x: 8.0, z: 0 }, 
+        { x: 0, z: 8.0 }
     ];
 
-    treePositions.forEach(p => {
+    treePositions.forEach((p, index) => {
+        // Determinamos si es un árbol lejano (índice mayor a 4) para hacerlo más oscuro
+        const isFarTree = index > 4;
+        
         const trunkGeo = new THREE.CylinderGeometry(0.12, 0.2, 3, 8);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+        // Tronco estándar o más oscuro para los lejanos
+        const trunkMat = new THREE.MeshStandardMaterial({ 
+            color: isFarTree ? 0x271a14 : 0x3f2e25, 
+            roughness: 0.9 
+        });
         const trunk = new THREE.Mesh(trunkGeo, trunkMat);
         trunk.position.set(p.x, 0, p.z);
 
         const leavesGeo = new THREE.DodecahedronGeometry(1.2, 1);
-        const leavesMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.6 });
+        // Hojas: Verde bosque profundo para los cercanos, casi negro/verde muy oscuro para los lejanos
+        const leavesMat = new THREE.MeshStandardMaterial({ 
+            color: isFarTree ? 0x022c22 : 0x064e3b, 
+            roughness: 0.8 
+        });
         const leaves = new THREE.Mesh(leavesGeo, leavesMat);
         leaves.position.set(p.x, 1.8, p.z);
 
