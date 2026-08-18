@@ -59,8 +59,7 @@
             <!-- Splat Vignette & Ambient Glow Overlay -->
             <div class="absolute inset-0 splat-vignette"></div>
 
-
-                <!-- CONTENEDOR SUPERIOR UNIFICADO (Sin scroll y completamente fijo) -->
+            <!-- CONTENEDOR SUPERIOR UNIFICADO -->
             <div class="absolute top-4 left-4 right-16 sm:right-24 z-30 flex flex-col gap-2.5 max-w-md pointer-events-none">
                 
                 <!-- App Top Header Overlay -->
@@ -83,7 +82,7 @@
                     </button>
                 </div>
 
-                <!-- BARRA DE FILTRADO ADAPTATIVA (Sin scroll, distribución fija) -->
+                <!-- BARRA DE FILTRADO ADAPTATIVA -->
                 <div class="glass-panel rounded-2xl p-1.5 grid grid-cols-4 gap-1 border border-slate-700/60 shadow-xl bg-slate-950/80 backdrop-blur-md pointer-events-auto w-full">
                     <button id="filter-all" onclick="filterCategory('all')" ontouchstart="filterCategory('all'); event.preventDefault();" 
                             class="glass-pill glass-pill-active py-1.5 px-1 rounded-xl text-[11px] font-semibold transition flex items-center justify-center gap-1 cursor-pointer touch-manipulation truncate">
@@ -103,12 +102,11 @@
                     </button>
                 </div>
             </div>
-            </div>
 
             <!-- DYNAMIC FLOATING GLASS HOTSPOTS CONTAINER -->
             <div id="hotspots-overlay" class="absolute inset-0 pointer-events-none z-20"></div>
 
-            <!-- Bottom Floating Mini Banner (GPS Trail Progress - Alineado a la Izquierda) -->
+            <!-- Bottom Floating Mini Banner (GPS Trail Progress) -->
             <div class="absolute bottom-20 left-4 right-4 sm:bottom-24 sm:left-4 sm:right-auto sm:w-80 z-30">
                 <div class="glass-panel rounded-2xl p-3 px-4 flex items-center justify-between text-xs shadow-2xl">
                     <div class="flex items-center gap-3">
@@ -126,16 +124,15 @@
                 </div>
             </div>
 
-            <!-- BOTTOM SHEET MODAL (Con padding inferior para evitar que el menú lo tape) -->
+            <!-- BOTTOM SHEET MODAL -->
             <div id="bottom-sheet" 
                 class="fixed bottom-0 left-0 right-0 z-50 transform translate-y-full transition-transform duration-300 ease-out max-w-lg mx-auto px-4 pb-24 pt-2 pointer-events-auto">
                 <div class="glass-panel rounded-3xl p-5 shadow-2xl relative border border-slate-700/60 bg-slate-950/90 backdrop-blur-xl max-h-[75vh] overflow-y-auto no-scrollbar">
-                    <!-- Contenido dinámico inyectado desde JS -->
                     <div id="sheet-content"></div>
                 </div>
             </div>
 
-            <!-- TAB PANELS OVERLAY (Ajustado con pb-28 para que no se corte contenido abajo) -->
+            <!-- TAB PANELS OVERLAY -->
             <div id="tab-panel-container" class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl z-40 hidden flex-col p-4 sm:p-10 pt-20 pb-28 overflow-y-auto no-scrollbar max-w-2xl mx-auto">
                 <button onclick="closeTabPanel()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center hover:text-white shadow-lg z-50">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -144,7 +141,7 @@
             </div>
         </div>
 
-        <!-- GLASS BOTTOM NAVIGATION BAR (Ubicación segura sobre el borde inferior) -->
+        <!-- GLASS BOTTOM NAVIGATION BAR -->
         <nav class="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 glass-panel rounded-full px-5 py-2 sm:px-8 sm:py-3 flex items-center gap-5 sm:gap-10 shadow-2xl border border-slate-700/50 pointer-events-auto">
             <button id="nav-trail" onclick="switchTab('trail')" ontouchstart="switchTab('trail')" class="flex flex-col items-center gap-0.5 text-emerald-400 font-medium touch-manipulation cursor-pointer transition hover:text-emerald-300">
                 <i class="fa-solid fa-compass text-base sm:text-lg"></i>

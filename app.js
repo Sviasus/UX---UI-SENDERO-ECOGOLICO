@@ -46,7 +46,7 @@ const trailData = [
         typeLabel: 'Flora Epífita',
         image: 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=600&q=80',
         shortDesc: 'Hermosa orquídea epífita que crece sobre los troncos húmedos.',
-        fullDesc: 'Crece sin parásitar a los árboles, absorbiendo humedad del aire y niebla del sendero. Sus colores varían del rosa pálido al violeta profundo.',
+        fullDesc: 'Crece sin parasitar a los árboles, absorbiendo humedad del aire y niebla del sendero. Sus colores varían del rosa pálido al violeta profundo.',
         conservation: 'Vulnerable (VU)',
         curiosity: 'Fue elegida flor nacional en 1936 por los vivos colores de su pétalo lipófilo central.',
         discovered: true,
@@ -112,7 +112,7 @@ const trailData = [
 let scene, camera, renderer, controls;
 let splatParticles, trailLineMesh, treeGroup;
 let currentFilter = 'all';
-let isDragging = false; // Control para evitar conflictos de clic y arrastre en PC
+let isDragging = false; 
 
 function initThreeJS() {
     const container = document.getElementById('three-canvas');
@@ -139,7 +139,6 @@ function initThreeJS() {
     controls.minDistance = 2;
     controls.maxDistance = 12;
 
-    // Detectar si el usuario está arrastrando la cámara para no abrir hotspots por accidente en PC
     renderer.domElement.addEventListener('pointerdown', () => { isDragging = false; });
     renderer.domElement.addEventListener('pointermove', () => { isDragging = true; });
 
