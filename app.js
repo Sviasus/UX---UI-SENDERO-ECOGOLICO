@@ -46,7 +46,7 @@ const trailData = [
         typeLabel: 'Flora Epífita',
         image: 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=600&q=80',
         shortDesc: 'Hermosa orquídea epífita que crece sobre los troncos húmedos.',
-        fullDesc: 'Crece sin parasitar a los árboles, absorbiendo humedad del aire y niebla del sendero. Sus colores varían del rosa pálido al violeta profundo.',
+        fullDesc: 'Crece sin parásitar a los árboles, absorbiendo humedad del aire y niebla del sendero. Sus colores varían del rosa pálido al violeta profundo.',
         conservation: 'Vulnerable (VU)',
         curiosity: 'Fue elegida flor nacional en 1936 por los vivos colores de su pétalo lipófilo central.',
         discovered: true,
@@ -112,7 +112,6 @@ const trailData = [
 let scene, camera, renderer, controls;
 let splatParticles, trailLineMesh, treeGroup;
 let currentFilter = 'all';
-let isDragging = false; 
 
 function initThreeJS() {
     const container = document.getElementById('three-canvas');
@@ -121,6 +120,7 @@ function initThreeJS() {
     const height = container.clientHeight || window.innerHeight;
 
     scene = new THREE.Scene();
+    // 1. Color de fondo del cielo (Azul cielo diurno) y la niebla que se funde con el horizonte
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.FogExp2(0x87ceeb, 0.05);
 
@@ -139,16 +139,16 @@ function initThreeJS() {
     controls.minDistance = 2;
     controls.maxDistance = 12;
 
-    renderer.domElement.addEventListener('pointerdown', () => { isDragging = false; });
-    renderer.domElement.addEventListener('pointermove', () => { isDragging = true; });
-
+    // 2. Luz ambiental clara y luminosa simulando la luz rebotada del cielo diurno
     const ambientLight = new THREE.AmbientLight(0xd9f99d, 1.2);
     scene.add(ambientLight);
 
+    // 3. Sol brillante y cálido desde arriba
     const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
     sunLight.position.set(5, 12, 5);
     scene.add(sunLight);
 
+    // 4. Luz de realce suave para los elementos del suelo
     const pointLight = new THREE.PointLight(0xfef08a, 2, 10);
     pointLight.position.set(0, 2, 0);
     scene.add(pointLight);
@@ -238,19 +238,23 @@ function createParticlesCloud() {
 function create3DTrees() {
     treeGroup = new THREE.Group();
     
+    // Lista original y 5 nuevas posiciones más lejanas (z más alto en negativo o positivo)
     const treePositions = [
         { x: -3.5, z: -2 }, { x: 3.2, z: -3 },
         { x: -2.8, z: 2 }, { x: 2.8, z: 2.5 },
         { x: 0, z: -4 },
+        // Nuevos árboles más lejos
         { x: -6.0, z: -7.0 }, { x: 6.0, z: -7.0 }, 
         { x: -8.0, z: 0 }, { x: 8.0, z: 0 }, 
         { x: 0, z: 8.0 }
     ];
 
     treePositions.forEach((p, index) => {
+        // Determinamos si es un árbol lejano (índice mayor a 4) para hacerlo más oscuro
         const isFarTree = index > 4;
         
         const trunkGeo = new THREE.CylinderGeometry(0.12, 0.2, 3, 8);
+        // Tronco estándar o más oscuro para los lejanos
         const trunkMat = new THREE.MeshStandardMaterial({ 
             color: isFarTree ? 0x271a14 : 0x3f2e25, 
             roughness: 0.9 
@@ -259,6 +263,7 @@ function create3DTrees() {
         trunk.position.set(p.x, 0, p.z);
 
         const leavesGeo = new THREE.DodecahedronGeometry(1.2, 1);
+        // Hojas: Verde bosque profundo para los cercanos, casi negro/verde muy oscuro para los lejanos
         const leavesMat = new THREE.MeshStandardMaterial({ 
             color: isFarTree ? 0x022c22 : 0x064e3b, 
             roughness: 0.8 
@@ -318,8 +323,8 @@ function updateHotspotsOverlay() {
 
         if (vec.z < 1) {
             html += `
-                <div data-id="${item.id}"
-                     onpointerup="if(!isDragging){ selectHotspot('${item.id}'); }"
+                <div onclick="selectHotspot('${item.id}')" 
+                     ontouchstart="selectHotspot('${item.id}')"
                      style="left: ${x}px; top: ${y}px;" 
                      class="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-30 touch-manipulation">
                     <div class="hotspot-ring"></div>
@@ -360,7 +365,7 @@ function selectHotspot(id) {
 
     content.innerHTML = `
         <div class="relative pt-2">
-            <button onpointerup="closeBottomSheet(); event.stopPropagation();" 
+            <button onclick="closeBottomSheet()" ontouchstart="closeBottomSheet(); event.preventDefault();" 
                     class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm transition border border-slate-700 z-50 touch-manipulation cursor-pointer shadow-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -388,11 +393,11 @@ function selectHotspot(id) {
             </div>
 
             <div class="flex gap-2">
-                <button onpointerup="playSpeciesSound(${item.audioFreq})"
+                <button onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq}); event.preventDefault();"
                         class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-2 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-volume-high text-emerald-400"></i> Escuchar Canto
                 </button>
-                <button onpointerup="markAsDiscovered('${item.id}')"
+                <button onclick="markAsDiscovered('${item.id}')" ontouchstart="markAsDiscovered('${item.id}'); event.preventDefault();"
                         class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 touch-manipulation cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ${item.discovered ? 'Descubierto' : 'Marcar Hallazgo'}
                 </button>
@@ -440,9 +445,9 @@ function filterCategory(cat) {
         const btn = document.getElementById(`filter-${c}`);
         if (btn) {
             if (c === cat) {
-                btn.className = 'glass-pill glass-pill-active py-1.5 px-1 rounded-xl text-[11px] font-semibold transition flex items-center justify-center gap-1 cursor-pointer touch-manipulation truncate';
+                btn.className = 'glass-pill glass-pill-active px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition flex items-center gap-1.5 touch-manipulation cursor-pointer';
             } else {
-                btn.className = 'glass-pill py-1.5 px-1 rounded-xl text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1 hover:text-emerald-300 cursor-pointer touch-manipulation truncate';
+                btn.className = 'glass-pill px-3 py-1 rounded-full text-[11px] font-semibold text-slate-300 whitespace-nowrap transition flex items-center gap-1.5 hover:text-emerald-300 touch-manipulation cursor-pointer';
             }
         }
     });
@@ -512,7 +517,7 @@ function switchTab(tab) {
             </h2>
             <div class="space-y-3">
                 ${trailData.map(item => `
-                    <div onpointerup="selectHotspot('${item.id}'); closeTabPanel();" 
+                    <div onclick="selectHotspot('${item.id}'); closeTabPanel();" ontouchstart="selectHotspot('${item.id}'); closeTabPanel();" 
                          class="glass-panel rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 transition touch-manipulation">
                         <img src="${item.image}" class="w-14 h-14 rounded-xl object-cover">
                         <div class="flex-1">
@@ -530,11 +535,11 @@ function switchTab(tab) {
             <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
                 <i class="fa-solid fa-headphones text-emerald-400"></i> Paisajes Sonoros & Cantos
             </h2>
-            
+
             <div class="space-y-2">
                 <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
                 ${trailData.filter(x => x.category === 'fauna').map(item => `
-                    <div onpointerup="playSpeciesSound(${item.audioFreq})" 
+                    <div onclick="playSpeciesSound(${item.audioFreq})" ontouchstart="playSpeciesSound(${item.audioFreq})" 
                          class="glass-panel p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/60 touch-manipulation">
                         <div class="flex items-center gap-2.5">
                             <i class="fa-solid fa-circle-play text-emerald-400 text-lg"></i>
@@ -596,7 +601,7 @@ function closeTabPanel() {
 }
 
 /* ==========================================================================
-   WEB AUDIO SYNTHESIZER (MOBILE COMPATIBLE)
+   WEB AUDIO SYNTHESIZER (MOBIL COMPATIBLE)
    ========================================================================== */
 let audioCtx;
 let isAudioPlaying = false;
@@ -753,7 +758,7 @@ function handleSearch() {
     const filtered = trailData.filter(x => x.name.toLowerCase().includes(query) || x.scientific.toLowerCase().includes(query));
 
     results.innerHTML = filtered.map(item => `
-        <div onpointerup="selectHotspot('${item.id}'); closeSearchModal();"
+        <div onclick="selectHotspot('${item.id}'); closeSearchModal();" ontouchstart="selectHotspot('${item.id}'); closeSearchModal();"
              class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 touch-manipulation">
             <div>
                 <h4 class="text-xs font-bold text-slate-100">${item.name}</h4>
