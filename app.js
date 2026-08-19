@@ -530,16 +530,7 @@ function switchTab(tab) {
             <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
                 <i class="fa-solid fa-headphones text-emerald-400"></i> Paisajes Sonoros & Cantos
             </h2>
-            <div class="glass-panel rounded-2xl p-4 mb-4 text-center">
-                <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-2 border border-emerald-500/40 animate-pulse">
-                    <i class="fa-solid fa-radio"></i>
-                </div>
-                <h3 class="text-xs font-bold text-slate-100">Sintonizador del Bosque Nublado</h3>
-                <p class="text-[10px] text-slate-400 mt-1">Sintetizador binaural de fauna y viento en tiempo real.</p>
-                <button onpointerup="toggleAudio()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold shadow-lg touch-manipulation cursor-pointer">
-                    Reproducir Ambiente
-                </button>
-            </div>
+            
             <div class="space-y-2">
                 <h4 class="text-xs font-bold text-slate-300 mb-2">Audios de Aves Registradas</h4>
                 ${trailData.filter(x => x.category === 'fauna').map(item => `
